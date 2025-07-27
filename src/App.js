@@ -1,23 +1,25 @@
+// App.js
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-
+import { Routes, Route } from 'react-router-dom';
+import Layout from './components/Layout';
 import Login from './components/Login';
-import Dashboard from './components/Dashboard';
+import SuperAdminDashboard from './components/SuperAdminDashboard';
+import AdminDashboard from './components/AdminDashboard';
+import StudentDashboard from './components/StudentDashboard';
 import Admin from './components/Admin';
-import Sidebar from './components/Sidebar';         
 
-const App = () => {
+function App() {
   return (
-    <Router>
-      <Sidebar />
-      <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/admin" element={<Admin />} />
-
-      </Routes>
-    </Router>
+    <Routes>
+      <Route path="/login" element={<Login />} />
+      <Route path="/" element={<Layout />}>
+        <Route path="super-admin-dashboard" element={<SuperAdminDashboard />} />
+        <Route path="admin-dashboard" element={<AdminDashboard />} />
+        <Route path="student-dashboard" element={<StudentDashboard />} />
+        <Route path="admins" element={<Admin />} />
+      </Route>
+    </Routes>
   );
-};
+}
 
 export default App;

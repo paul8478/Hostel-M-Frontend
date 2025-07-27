@@ -1,35 +1,54 @@
 import React, { useState } from 'react';
-import axios from '../api/axiosInstance';
 import { useNavigate } from 'react-router-dom';
+import adminAxios from '../api/admin_axios';
 
-const Login = () => {
+function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setError('');
+
     try {
-     const res = await axios.post('/admins/login', { email, password });
-     console.log('Login success', res.data);
-      localStorage.setItem('admin', JSON.stringify(res.data)); // Save admin info
-      navigate('/dashboard');
+      const response = await adminAxios.post('/login', { email, password });
+
+      // ✅ Extract permission from response
+      const { permission } = response.data;
+
+      // ✅ Redirect based on permission
+      if (permission === 'ALL') {
+        navigate('/super-admin-dashboard');
+      } else if (permission === 'VIEW_ONLY' || permission === 'EDIT') {
+        navigate('/admin-dashboard');
+      } else {
+        navigate('/student-dashboard');
+      }
     } catch (err) {
-      console.error('Login failed', err.response?.data || err.message);
-      alert('Login failed');
+      setError('Invalid credentials or server error.');
+      console.error(err);
     }
   };
 
   return (
-    <div style={{ padding: '20px' }}>
-      <h2>Admin Login</h2>
+    <div>
+      <h2>Login</h2>
+      {error && <p style={{ color: 'red' }}>{error}</p>}
       <form onSubmit={handleLogin}>
-        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" /><br />
-        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" /><br />
+        <label>
+          Email:
+          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+        </label><br />
+        <label>
+          Password:
+          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+        </label><br />
         <button type="submit">Login</button>
       </form>
     </div>
   );
-};
+}
 
 export default Login;

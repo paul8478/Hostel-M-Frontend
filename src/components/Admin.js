@@ -1,108 +1,71 @@
-import React, { useEffect, useState } from 'react';
-import { getAllAdmins, createAdmin } from '../services/adminService'; 
-import '../css/sidebar.css';
-import '../css/student.css';
+import React, { useEffect, useState } from "react";
+import adminAxios from "../api/admin_axios";
 
-const Admin = () => {
+function Admin() {
   const [admins, setAdmins] = useState([]);
-  const [error, setError] = useState('');
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    permission: ''
-  });
+  const [newAdmin, setNewAdmin] = useState({ name: "", email: "", password: "", permission: "VIEW_ONLY" });
 
-  const [search, setSearch] = useState('');
-  const [filteredAdmins, setFilteredAdmins] = useState([]);
+  const fetchAdmins = async () => {
+    try {
+      const res = await adminAxios.get("/");
+      setAdmins(res.data);
+    } catch (err) {
+      console.error("Error fetching admins:", err);
+    }
+  };
+
+  const createAdmin = async () => {
+    try {
+      await adminAxios.post("/", newAdmin);
+      setNewAdmin({ name: "", email: "", password: "", permission: "VIEW_ONLY" });
+      fetchAdmins();
+    } catch (err) {
+      console.error("Error creating admin:", err);
+    }
+  };
+
+  const deleteAdmin = async (id) => {
+    try {
+      await adminAxios.delete(`/${id}`);
+      fetchAdmins();
+    } catch (err) {
+      console.error("Error deleting admin:", err);
+    }
+  };
 
   useEffect(() => {
     fetchAdmins();
   }, []);
 
-  const fetchAdmins = () => {
-    getAllAdmins()
-      .then(response => {
-        setAdmins(response.data);
-        setFilteredAdmins(response.data); // Default list
-      })
-      .catch(err => {
-        setError('Failed to fetch admins');
-        console.error(err);
-      });
-  };
-
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSearchChange = (e) => {
-    setSearch(e.target.value);
-  };
-
-  const handleSearchSubmit = (e) => {
-    e.preventDefault();
-    const results = admins.filter(admin =>
-      admin.email.toLowerCase().includes(search.toLowerCase())
-    );
-    setFilteredAdmins(results);
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    createAdmin(formData)
-      .then(() => {
-        setFormData({ name: '', email: '', password: '', permission: '' });
-        fetchAdmins();
-      })
-      .catch(err => {
-        setError('Failed to add admin');
-        console.error(err);
-      });
-  };
-
   return (
-    <div className="box">
-      <h1>Admin Data</h1>
+    <div>
+      <h2>Admin Management</h2>
 
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      <div>
+        <input placeholder="Name" value={newAdmin.name} onChange={(e) => setNewAdmin({ ...newAdmin, name: e.target.value })} />
+        <input placeholder="Email" value={newAdmin.email} onChange={(e) => setNewAdmin({ ...newAdmin, email: e.target.value })} />
+        <input placeholder="Password" value={newAdmin.password} onChange={(e) => setNewAdmin({ ...newAdmin, password: e.target.value })} />
+        <select value={newAdmin.permission} onChange={(e) => setNewAdmin({ ...newAdmin, permission: e.target.value })}>
+          <option value="ALL">ALL</option>
+          <option value="EDIT_ONLY">EDIT_ONLY</option>
+          <option value="VIEW_ONLY">VIEW_ONLY</option>
+        </select>
+        <button onClick={createAdmin}>Create Admin</button>
+      </div>
 
-      {/* Add Admin Form */}
-      <form onSubmit={handleSubmit} className="admin-form">
-        <input type="text" name="name" placeholder="Name" value={formData.name} onChange={handleChange} required />
-        <input type="email" name="email" placeholder="Email" value={formData.email} onChange={handleChange} required />
-        <input type="password" name="password" placeholder="Password" value={formData.password} onChange={handleChange} required />
-        <input type="text" name="permission" placeholder="Permission" value={formData.permission} onChange={handleChange} required />
-        <button type="submit">Add Admin</button>
-      </form>
-
-      {/* Search Form */}
-      <form onSubmit={handleSearchSubmit} className="admin-form">
-        <input type="text" placeholder="Search by email" value={search} onChange={handleSearchChange} />
-        <button type="submit">Search Admin</button>
-      </form>
-
-      {/* Admin Table */}
-      <table className="student-table">
+      <table>
         <thead>
-          <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Password</th>
-            <th>Permission</th>
-            <th>Actions</th>
-          </tr>
+          <tr><th>Name</th><th>Email</th><th>Permission</th><th>Actions</th></tr>
         </thead>
         <tbody>
-          {filteredAdmins.map(admin => (
+          {admins.map((admin) => (
             <tr key={admin.id}>
               <td>{admin.name}</td>
               <td>{admin.email}</td>
-              <td>{admin.password}</td>
               <td>{admin.permission}</td>
               <td>
-                <button>Edit</button>
-                <button>Delete</button>
+                <button onClick={() => deleteAdmin(admin.id)}>Delete</button>
+                {/* Optional: Edit button */}
               </td>
             </tr>
           ))}
@@ -110,6 +73,6 @@ const Admin = () => {
       </table>
     </div>
   );
-};
+}
 
 export default Admin;

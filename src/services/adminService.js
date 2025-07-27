@@ -1,4 +1,4 @@
-import axios from '../api/admin_axios ';
+import axios from '../api/admin_axios';
 import Admin from '../components/Admin';
 
 export const getAllAdmins = () => axios.get('');
