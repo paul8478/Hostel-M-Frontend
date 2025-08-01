@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import collegeAxios from '../api/college_axios';
-import principalAxios from '../api/principal_axios'; // 🔁 You need to create this file
+import principalAxios from '../api/principal_axios';
 
 function PrincipalManagement() {
   const [colleges, setColleges] = useState([]);
@@ -13,11 +13,26 @@ function PrincipalManagement() {
     colgid: ''
   });
 
-  useEffect(() => {
-    fetchColleges();
-    fetchPrincipals();
+  const [principal, setPrincipal] = useState(null);
+  const [allowed, setAllowed] = useState(null); // null = loading, true = allowed, false = blocked
 
-  }, [colleges]);
+  useEffect(() => {
+    const storedData = sessionStorage.getItem('principalData');
+    if (storedData) {
+      const parsed = JSON.parse(storedData);
+      setPrincipal(parsed);
+      setAllowed(parsed.permission === 'ALL');
+    } else {
+      setAllowed(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (allowed) {
+      fetchColleges();
+      fetchPrincipals();
+    }
+  }, [allowed]);
 
   const fetchColleges = async () => {
     try {
@@ -70,8 +85,18 @@ function PrincipalManagement() {
     }
   };
 
+  // Loading or not allowed
+  if (allowed === null) {
+    return <h2>🔄 Loading permission data...</h2>;
+  }
+
+  if (!allowed) {
+    return <h2 style={{ color: 'red' }}>🚫 Access denied.</h2>;
+  }
+
   return (
     <div style={{ padding: '1rem' }}>
+      <h2>Welcome, {principal?.name} (Permission: {principal?.permission})</h2>
       <h3>👤 Principal Management</h3>
 
       {/* Form */}

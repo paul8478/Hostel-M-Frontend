@@ -1,12 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import collegeAxios from '../api/college_axios.js';
+import { useNavigate } from 'react-router-dom';
 
 function CollegeManagement() {
   const [colleges, setColleges] = useState([]);
   const [newCollege, setNewCollege] = useState({ colgname: '', address: '' });
+  const [permissionAllowed, setPermissionAllowed] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    fetchColleges();
+    const storedData = sessionStorage.getItem('principalData');
+    if (storedData) {
+      const parsedData = JSON.parse(storedData);
+      if (parsedData.permission === 'ALL') {
+        setPermissionAllowed(true);
+        fetchColleges();
+      } else {
+        setPermissionAllowed(false);
+      }
+    } else {
+      // No session data found, redirect to login
+      navigate('/');
+    }
   }, []);
 
   const fetchColleges = async () => {
@@ -43,6 +58,10 @@ function CollegeManagement() {
       console.error('❌ Error deleting college:', err);
     }
   };
+
+  if (!permissionAllowed) {
+    return <h2 style={{ color: 'red' }}>⛔ Access Denied</h2>;
+  }
 
   return (
     <div style={{ padding: '1rem' }}>

@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import Students from './Student';
+import { useNavigate } from 'react-router-dom'; // for redirect
 
-import CollegeManagement from './CollegeManagement';
-import PrincipalManagement from './PrincipalManagement';
-
-function SuperAdminDashboard() {
+function PrincipalDashboard() {
   const [principal, setPrincipal] = useState(null);
   const navigate = useNavigate();
 
@@ -17,48 +15,33 @@ function SuperAdminDashboard() {
 
   const handleLogout = () => {
     sessionStorage.removeItem('principalData');
-    navigate('/');
+    navigate('/'); // Redirect to login/home page (adjust path as needed)
   };
 
   if (!principal) {
-    return <h2>Loading admin data...</h2>;
+    return <h2>Loading principal data...</h2>;
   }
 
   return (
-    <div style={{ padding: '20px' }}>
+    <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h2>Welcome, {principal.name}</h2>
-        <button
-          onClick={handleLogout}
-          style={{
-            padding: '5px 10px',
-            background: 'red',
-            color: 'white',
-            border: 'none',
-            borderRadius: '5px'
-          }}
-        >
+        <button onClick={handleLogout} style={{ padding: '5px 10px', background: 'red', color: 'white', border: 'none', borderRadius: '5px' }}>
           🚪 Logout
         </button>
       </div>
 
+      <p><strong>College ID:</strong> {principal.colgid}</p>
       <p><strong>Email:</strong> {principal.email}</p>
       <p><strong>Password:</strong> {principal.password}</p>
       <p><strong>Permission:</strong> {principal.permission}</p>
 
-      <h2>Super Admin Dashboard</h2>
-
       <section style={{ marginTop: '30px' }}>
         <h3>🧑‍💼 Admin Management</h3>
-        <PrincipalManagement />
-      </section>
-
-      <section style={{ marginTop: '30px' }}>
-        <h3>🏫 College Management</h3>
-        <CollegeManagement />
+        <Students />
       </section>
     </div>
   );
 }
 
-export default SuperAdminDashboard;
+export default PrincipalDashboard;
