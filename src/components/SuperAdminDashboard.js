@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 import CollegeManagement from './CollegeManagement';
 import PrincipalManagement from './PrincipalManagement';
+import '../components/SuperAdminDashboard.css'; 
 
 function SuperAdminDashboard() {
   const [principal, setPrincipal] = useState(null);

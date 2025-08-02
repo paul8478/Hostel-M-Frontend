@@ -1,25 +1,41 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+// src/pages/Home.js
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import banner from "../Images/hosttel.jpeg"; 
+import "../components/Home.css"; 
 
-const Home = () => (
-  <div style={{ padding: '20px' }}>
-    <h1>Welcome to the Hostel Management System</h1>
-    <p>This is a community-driven management system for hostels.</p>
-    <Link
-      to="/login"
-      style={{
-        display: 'inline-block',
-        padding: '10px 20px',
-        backgroundColor: '#007bff',
-        color: 'white',
-        textDecoration: 'none',
-        borderRadius: '4px',
-        fontWeight: 'bold',
-      }}
-    >
-      Login
-    </Link>
-  </div>
-);
+const Home = () => {
+  const navigate = useNavigate();
+
+  const handleLoginClick = () => {
+    navigate('/login'); // This will redirect to the login page
+  };
+
+  return (
+    <div className="home-container">
+      <div className="content-section">
+        <div className="home-hero">
+          <h1 className="home-title">Hostel Management</h1>
+          <p className="home-subtitle">
+            Community driver hostel management system
+          </p>
+          <button className="home-button" onClick={handleLoginClick}>
+            Login to Your Account
+          </button>
+        </div>
+      </div>
+      
+      <div className="image-section">
+        <img
+          src={banner}
+          alt="Creative Learning Platform"
+          className="floating-illustration"
+          loading="eager"
+          decoding="sync"
+        />
+      </div>
+    </div>
+  );
+};
 
 export default Home;

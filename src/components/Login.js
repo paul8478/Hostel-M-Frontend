@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import adminAxios from '../api/admin_axios';
+import '../components/Login.css'; // Already present
 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
@@ -14,17 +17,15 @@ function Login() {
 
     try {
       const response = await adminAxios.post('/login', { email, password });
-      console.log('Login response:', response.data);
-
-      // Assuming backend returns user data either inside 'user' or directly
       const user = response.data.user || response.data;
 
       if (user && Object.keys(user).length > 0) {
-        // Store user data in sessionStorage
-        sessionStorage.setItem('principalData', JSON.stringify(user));
-        console.log('Stored principalData:', sessionStorage.getItem('principalData'));
+        if (rememberMe) {
+          localStorage.setItem('principalData', JSON.stringify(user));
+        } else {
+          sessionStorage.setItem('principalData', JSON.stringify(user));
+        }
 
-        // Navigate based on permission
         const permission = user.permission || response.data.permission || '';
         if (permission === 'VIEW_ONLY' || permission === 'EDIT') {
           navigate('/principal-dashboard');
@@ -43,9 +44,9 @@ function Login() {
   };
 
   return (
-    <div>
+    <div className="login-box">
       <h2>Login</h2>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {error && <p className="error-message">{error}</p>}
       <form onSubmit={handleLogin}>
         <label>
           Email:
@@ -58,17 +59,38 @@ function Login() {
           />
         </label>
         <br />
+
         <label>
           Password:
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            autoComplete="current-password"
-          />
+          <div className="password-wrapper">
+            <input
+              type={showPassword ? 'text' : 'password'}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              autoComplete="current-password"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((prev) => !prev)}
+              className="toggle-password-btn"
+            >
+              {showPassword ? 'Hide' : 'Show'}
+            </button>
+          </div>
         </label>
         <br />
+
+        <label className="remember-me">
+          <input
+            type="checkbox"
+            checked={rememberMe}
+            onChange={(e) => setRememberMe(e.target.checked)}
+          />
+          Remember Me
+        </label>
+        <br />
+
         <button type="submit">Login</button>
       </form>
     </div>
