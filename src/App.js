@@ -16,9 +16,10 @@ function App() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
+              <Route index element={<Home />} />
+
       <Route path="/" element={<Layout />}>
         {/* Add this index route to show Home at root '/' */}
-        <Route index element={<Home />} />
 
         <Route path="super-admin-dashboard" element={<SuperAdminDashboard />} />
         <Route path="principal-dashboard" element={<PrincipalDashboard />} />

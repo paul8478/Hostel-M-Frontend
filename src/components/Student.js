@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import collegeAxios from '../api/student_axios.js';
 
-function Student() {
+export default function Student() {
   const [students, setStudents] = useState([]);
   const [newStudent, setNewStudent] = useState({
     name: '',
@@ -13,27 +13,21 @@ function Student() {
   });
 
   const [principal, setPrincipal] = useState(null);
-  const [allowed, setAllowed] = useState(null); // Track permission state
+  const [allowed, setAllowed] = useState(null);
 
   useEffect(() => {
     const storedData = sessionStorage.getItem('principalData');
     if (storedData) {
       const parsed = JSON.parse(storedData);
       setPrincipal(parsed);
-      if (parsed.permission === 'EDIT' || parsed.permission === 'ALL') {
-        setAllowed(true);
-      } else {
-        setAllowed(false);
-      }
+      setAllowed(parsed.permission === 'EDIT' || parsed.permission === 'ALL');
     } else {
       setAllowed(false);
     }
   }, []);
 
   useEffect(() => {
-    if (allowed) {
-      fetchStudents();
-    }
+    if (allowed) fetchStudents();
   }, [allowed]);
 
   const fetchStudents = async () => {
@@ -46,28 +40,15 @@ function Student() {
   };
 
   const handleCreateStudent = async () => {
-    const studentData = {
-      ...newStudent,
-      colgid: principal.colgid
-    };
-
+    const studentData = { ...newStudent, colgid: principal.colgid };
     const { name, address, email, password, rollnumber } = studentData;
-
     if (!name || !address || !email || !password || !rollnumber) {
       alert('Please fill out all fields.');
       return;
     }
-
     try {
       await collegeAxios.post('', studentData);
-      setNewStudent({
-        name: '',
-        address: '',
-        email: '',
-        password: '',
-        rollnumber: '',
-        colgid: ''
-      });
+      setNewStudent({ name: '', address: '', email: '', password: '', rollnumber: '', colgid: '' });
       fetchStudents();
     } catch (err) {
       console.error('❌ Error creating student:', err);
@@ -76,7 +57,6 @@ function Student() {
 
   const deleteStudent = async (id) => {
     if (!window.confirm('Are you sure you want to delete this student?')) return;
-
     try {
       await collegeAxios.delete(`/${id}`);
       fetchStudents();
@@ -86,75 +66,100 @@ function Student() {
   };
 
   if (allowed === null) {
-    return <h2>Loading principal data...</h2>;
+    return (
+      <div className="d-flex justify-content-center align-items-center vh-100">
+        <h2 className="text-secondary">Loading principal data...</h2>
+      </div>
+    );
   }
 
   if (!allowed) {
-    return <h2 style={{ color: 'red' }}>🚫 You are not allowed!!!</h2>;
+    return (
+      <div className="d-flex justify-content-center align-items-center vh-100">
+        <h2 className="text-danger">🚫 You are not allowed!!!</h2>
+      </div>
+    );
   }
 
   return (
-    <div style={{ padding: '1rem' }}>
-      <h2>Welcome, {principal.name}</h2>
-
-      <h3>Add New Student</h3>
-      <div style={{ marginBottom: '1rem' }}>
-        <input
-          placeholder="Name"
-          value={newStudent.name}
-          onChange={(e) => setNewStudent({ ...newStudent, name: e.target.value })}
-          style={{ marginRight: '0.5rem' }}
-        />
-        <input
-          placeholder="Address"
-          value={newStudent.address}
-          onChange={(e) => setNewStudent({ ...newStudent, address: e.target.value })}
-          style={{ marginRight: '0.5rem' }}
-        />
-        <input
-          placeholder="Email"
-          value={newStudent.email}
-          onChange={(e) => setNewStudent({ ...newStudent, email: e.target.value })}
-          style={{ marginRight: '0.5rem' }}
-        />
-        <input
-          placeholder="Password"
-          type="password"
-          value={newStudent.password}
-          onChange={(e) => setNewStudent({ ...newStudent, password: e.target.value })}
-          style={{ marginRight: '0.5rem' }}
-        />
-        <input
-          placeholder="Roll Number"
-          value={newStudent.rollnumber}
-          onChange={(e) => setNewStudent({ ...newStudent, rollnumber: e.target.value })}
-          style={{ marginRight: '0.5rem' }}
-        />
-        <input type="hidden" value={principal.colgid} />
-        <button onClick={handleCreateStudent}>Add Student</button>
+    <div className="container mt-5">
+      {/* Header */}
+      <div
+        className="p-4 rounded shadow mb-5 text-white"
+        style={{ background: 'linear-gradient(to right, #43cea2, #185a9d)' }}
+      >
+        <h2 className="fw-bold">👋 Welcome, {principal.name}</h2>
       </div>
 
-      <h3>Student List</h3>
-      <ul>
-        {students
-          .filter((student) => {
-            if (principal.permission === 'ALL') return true;
-            return student.college?.id === principal.colgid;
-          })
-          .map((student) => (
-            <li key={student.id} style={{ marginBottom: '0.5rem' }}>
-              <strong>{student.name}</strong> — {student.email} — {student.rollnumber} — {student.address} — {student.password} - {student.college?.colgname || 'N/A'}
-              <button
-                style={{ marginLeft: '1rem' }}
-                onClick={() => deleteStudent(student.id)}
-              >
-                ❌ Delete
-              </button>
-            </li>
+      {/* Add New Student Form */}
+      <section className="mb-5">
+        <h3 className="mb-4 text-success">➕ Add New Student</h3>
+        <div className="row g-3">
+          {['name','address','email','password','rollnumber'].map((field, i) => (
+            <div className={`col-md-${field==='email'||field==='rollnumber'?4:4}`} key={i}>
+              <input
+                type={field==='password'?'password':'text'}
+                className="form-control"
+                placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
+                value={newStudent[field]}
+                onChange={e => setNewStudent({ ...newStudent, [field]: e.target.value })}
+              />
+            </div>
           ))}
-      </ul>
+          <div className="col-md-4 d-flex align-items-center">
+            <button className="btn btn-primary w-100" onClick={handleCreateStudent}>
+              Add Student
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Student List */}
+      <section>
+        <h3 className="mb-4 text-success">🎓 Student List</h3>
+        {students.length === 0 ? (
+          <p className="text-muted fst-italic">No students found.</p>
+        ) : (
+          <div className="table-responsive">
+            <table className="table table-bordered table-hover align-middle">
+              <thead className="table-light">
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Roll Number</th>
+                  <th>Address</th>
+                  <th>Password</th>
+                  <th>College</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {students
+                  .filter(s => principal.permission === 'ALL' || s.college?.id === principal.colgid)
+                  .map(student => (
+                    <tr key={student.id}>
+                      <td><strong>{student.name}</strong></td>
+                      <td>{student.email}</td>
+                      <td>{student.rollnumber}</td>
+                      <td>{student.address}</td>
+                      <td>{student.password}</td>
+                      <td><em>{student.college?.colgname || 'N/A'}</em></td>
+                      <td>
+                        <button
+                          className="btn btn-outline-danger btn-sm"
+                          onClick={() => deleteStudent(student.id)}
+                          title="Delete Student"
+                        >
+                          ❌
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
     </div>
   );
 }
-
-export default Student;

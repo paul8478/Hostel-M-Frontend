@@ -138,101 +138,234 @@ function Hostel() {
     setEditedHostelData({});
   };
 
-  if (allowed === null) return <h2>Loading principal data...</h2>;
-  if (!allowed) return <h2 style={{ color: 'red' }}>🚫 You are not allowed!!!</h2>;
+  if (allowed === null) {
+    return (
+      <div className="d-flex justify-content-center align-items-center vh-100">
+        <h2 className="text-secondary">Loading principal data...</h2>
+      </div>
+    );
+  }
+
+  if (!allowed) {
+    return (
+      <div className="d-flex justify-content-center align-items-center vh-100">
+        <h2 className="text-danger">🚫 You are not allowed!!!</h2>
+      </div>
+    );
+  }
 
   return (
-    <div style={{ padding: '1rem' }}>
-      <h2>Welcome, {principal.name}, College ID: {principal.colgid}</h2>
-
-      <h3>Add New Hostel Entry</h3>
-      <div style={{ marginBottom: '1rem' }}>
-        <input
-          placeholder="Availability"
-          value={newHostel.avail}
-          onChange={(e) => setNewHostel({ ...newHostel, avail: e.target.value })}
-        />
-        <input
-          placeholder="Block"
-          value={newHostel.block}
-          onChange={(e) => setNewHostel({ ...newHostel, block: e.target.value })}
-        />
-        <input
-          placeholder="Room"
-          value={newHostel.room}
-          onChange={(e) => setNewHostel({ ...newHostel, room: e.target.value })}
-        />
-        <input
-          placeholder="Money"
-          value={newHostel.money}
-          onChange={(e) => setNewHostel({ ...newHostel, money: e.target.value })}
-        />
-        <input
-          placeholder="Roll Number"
-          value={newHostel.rollnumber}
-          onChange={(e) => setNewHostel({ ...newHostel, rollnumber: e.target.value })}
-        />
-        {principal.permission === 'ALL' ? (
-          <select
-            value={newHostel.colgid}
-            onChange={(e) => setNewHostel({ ...newHostel, colgid: e.target.value })}
-          >
-            <option value="">Select College</option>
-            {colleges.map((col) => (
-              <option key={col.id} value={col.id}>
-                {col.colgname}
-              </option>
-            ))}
-          </select>
-        ) : (
-          <input type="text" value={principal.colgid} readOnly />
-        )}
-        <button onClick={handleCreateHostel}>Add Hostel</button>
+    <div className="container mt-5">
+      {/* Header */}
+      <div
+        className="p-4 rounded shadow mb-5 text-white"
+        style={{ background: 'linear-gradient(to right, #43cea2, #185a9d)' }}
+      >
+        <h2 className="fw-bold">👋 Welcome, {principal.name}</h2>
       </div>
 
-      <h3>Hostel List</h3>
-      <ul>
-        {hostels
-          .filter((hostel) =>
-            principal.permission === 'ALL' ? true : hostel.college?.id === principal.colgid
-          )
-          .map((hostel) => (
-            <li key={hostel.id} style={{ marginBottom: '0.5rem' }}>
-              {editingHostelId === hostel.id ? (
-                <>
-                  <input
-                    value={editedHostelData.block}
-                    onChange={(e) => handleEditChange('block', e.target.value)}
-                  /> — 
-                  <input
-                    value={editedHostelData.room}
-                    onChange={(e) => handleEditChange('room', e.target.value)}
-                  /> — 
-                  <input
-                    value={editedHostelData.money}
-                    onChange={(e) => handleEditChange('money', e.target.value)}
-                  /> — 
-                  <input
-                    value={editedHostelData.avail}
-                    onChange={(e) => handleEditChange('avail', e.target.value)}
-                  /> — 
-                  <input
-                    value={editedHostelData.rollnumber}
-                    onChange={(e) => handleEditChange('rollnumber', e.target.value)}
-                  />
-                  <button onClick={() => handleSaveEdit(hostel.id)}>💾 Save</button>
-                  <button onClick={handleCancelEdit}>❌ Cancel</button>
-                </>
-              ) : (
-                <>
-                  <strong>Block: {hostel.block}</strong> — Room: {hostel.room} — Money: ₹{hostel.money} — Availability: {hostel.avail} — Roll No: {hostel.rollnumber} — College: {hostel.college?.colgname || 'N/A'}
-                  <button onClick={() => handleEditClick(hostel)} style={{ marginLeft: '1rem' }}>✏️ Edit</button>
-                  <button onClick={() => deleteHostel(hostel.id)} style={{ marginLeft: '0.5rem' }}>🗑 Delete</button>
-                </>
-              )}
-            </li>
-          ))}
-      </ul>
+      {/* Add New Hostel Entry Form */}
+      <section className="mb-5">
+        <h3 className="mb-4 text-success">🏠 Add New Hostel Entry</h3>
+        <div className="row g-3">
+          <div className="col-md-4">
+            <input
+              type="text"
+              className="form-control"
+              placeholder="Availability"
+              value={newHostel.avail}
+              onChange={(e) => setNewHostel({ ...newHostel, avail: e.target.value })}
+            />
+          </div>
+          <div className="col-md-4">
+            <input
+              type="text"
+              className="form-control"
+              placeholder="Block"
+              value={newHostel.block}
+              onChange={(e) => setNewHostel({ ...newHostel, block: e.target.value })}
+            />
+          </div>
+          <div className="col-md-4">
+            <input
+              type="text"
+              className="form-control"
+              placeholder="Room"
+              value={newHostel.room}
+              onChange={(e) => setNewHostel({ ...newHostel, room: e.target.value })}
+            />
+          </div>
+          <div className="col-md-4">
+            <input
+              type="number"
+              className="form-control"
+              placeholder="Money"
+              value={newHostel.money}
+              onChange={(e) => setNewHostel({ ...newHostel, money: e.target.value })}
+            />
+          </div>
+          <div className="col-md-4">
+            <input
+              type="text"
+              className="form-control"
+              placeholder="Roll Number"
+              value={newHostel.rollnumber}
+              onChange={(e) => setNewHostel({ ...newHostel, rollnumber: e.target.value })}
+            />
+          </div>
+          <div className="col-md-4">
+            {principal.permission === 'ALL' ? (
+              <select
+                className="form-control"
+                value={newHostel.colgid}
+                onChange={(e) => setNewHostel({ ...newHostel, colgid: e.target.value })}
+              >
+                <option value="">Select College</option>
+                {colleges.map((col) => (
+                  <option key={col.id} value={col.id}>
+                    {col.colgname}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <input 
+                type="text" 
+                className="form-control" 
+                value={principal.colgid} 
+                readOnly 
+                style={{ backgroundColor: '#f8f9fa' }}
+              />
+            )}
+          </div>
+          <div className="col-12">
+            <button className="btn btn-primary" onClick={handleCreateHostel}>
+              Add Hostel Entry
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Hostel List */}
+      <section>
+        <h3 className="mb-4 text-success">🏠 Hostel List</h3>
+        {hostels.filter((hostel) =>
+          principal.permission === 'ALL' ? true : hostel.college?.id === principal.colgid
+        ).length === 0 ? (
+          <p className="text-muted fst-italic">No hostel entries found.</p>
+        ) : (
+          <div className="table-responsive">
+            <table className="table table-bordered table-hover align-middle">
+              <thead className="table-light">
+                <tr>
+                  <th>Block</th>
+                  <th>Room</th>
+                  <th>Money</th>
+                  <th>Availability</th>
+                  <th>Roll Number</th>
+                  <th>College</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {hostels
+                  .filter((hostel) =>
+                    principal.permission === 'ALL' ? true : hostel.college?.id === principal.colgid
+                  )
+                  .map((hostel) => (
+                    <tr key={hostel.id}>
+                      {editingHostelId === hostel.id ? (
+                        <>
+                          <td>
+                            <input
+                              type="text"
+                              className="form-control form-control-sm"
+                              value={editedHostelData.block}
+                              onChange={(e) => handleEditChange('block', e.target.value)}
+                            />
+                          </td>
+                          <td>
+                            <input
+                              type="text"
+                              className="form-control form-control-sm"
+                              value={editedHostelData.room}
+                              onChange={(e) => handleEditChange('room', e.target.value)}
+                            />
+                          </td>
+                          <td>
+                            <input
+                              type="number"
+                              className="form-control form-control-sm"
+                              value={editedHostelData.money}
+                              onChange={(e) => handleEditChange('money', e.target.value)}
+                            />
+                          </td>
+                          <td>
+                            <input
+                              type="text"
+                              className="form-control form-control-sm"
+                              value={editedHostelData.avail}
+                              onChange={(e) => handleEditChange('avail', e.target.value)}
+                            />
+                          </td>
+                          <td>
+                            <input
+                              type="text"
+                              className="form-control form-control-sm"
+                              value={editedHostelData.rollnumber}
+                              onChange={(e) => handleEditChange('rollnumber', e.target.value)}
+                            />
+                          </td>
+                          <td><em>{hostel.college?.colgname || 'N/A'}</em></td>
+                          <td>
+                            <button
+                              className="btn btn-success btn-sm me-2"
+                              onClick={() => handleSaveEdit(hostel.id)}
+                              title="Save Changes"
+                            >
+                              💾
+                            </button>
+                            <button
+                              className="btn btn-secondary btn-sm"
+                              onClick={handleCancelEdit}
+                              title="Cancel Edit"
+                            >
+                              ❌
+                            </button>
+                          </td>
+                        </>
+                      ) : (
+                        <>
+                          <td><strong>{hostel.block}</strong></td>
+                          <td>{hostel.room}</td>
+                          <td>₹{hostel.money}</td>
+                          <td>{hostel.avail}</td>
+                          <td>{hostel.rollnumber}</td>
+                          <td><em>{hostel.college?.colgname || 'N/A'}</em></td>
+                          <td>
+                            <button
+                              className="btn btn-outline-primary btn-sm me-2"
+                              onClick={() => handleEditClick(hostel)}
+                              title="Edit Hostel Entry"
+                            >
+                              ✏️
+                            </button>
+                            <button
+                              className="btn btn-outline-danger btn-sm"
+                              onClick={() => deleteHostel(hostel.id)}
+                              title="Delete Hostel Entry"
+                            >
+                              ❌
+                            </button>
+                          </td>
+                        </>
+                      )}
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
     </div>
   );
 }

@@ -85,84 +85,145 @@ function PrincipalManagement() {
     }
   };
 
-  // Loading or not allowed
   if (allowed === null) {
-    return <h2>🔄 Loading permission data...</h2>;
+    return (
+      <div className="d-flex justify-content-center align-items-center vh-100">
+        <h2 className="text-secondary">Loading permission data...</h2>
+      </div>
+    );
   }
 
   if (!allowed) {
-    return <h2 style={{ color: 'red' }}>🚫 Access denied.</h2>;
+    return (
+      <div className="d-flex justify-content-center align-items-center vh-100">
+        <h2 className="text-danger">🚫 Access denied.</h2>
+      </div>
+    );
   }
 
   return (
-    <div style={{ padding: '1rem' }}>
-      <h2>Welcome, {principal?.name} (Permission: {principal?.permission})</h2>
-      <h3>👤 Principal Management</h3>
-
-      {/* Form */}
-      <div style={{ marginBottom: '1rem' }}>
-        <input
-          placeholder="Name"
-          value={newPrincipal.name}
-          onChange={(e) => setNewPrincipal({ ...newPrincipal, name: e.target.value })}
-          style={{ marginRight: '0.5rem' }}
-        />
-        <input
-          placeholder="Email"
-          value={newPrincipal.email}
-          onChange={(e) => setNewPrincipal({ ...newPrincipal, email: e.target.value })}
-          style={{ marginRight: '0.5rem' }}
-        />
-        <input
-          placeholder="Password"
-          type="password"
-          value={newPrincipal.password}
-          onChange={(e) => setNewPrincipal({ ...newPrincipal, password: e.target.value })}
-          style={{ marginRight: '0.5rem' }}
-        />
-        <select
-          value={newPrincipal.permission}
-          onChange={(e) => setNewPrincipal({ ...newPrincipal, permission: e.target.value })}
-          style={{ marginRight: '0.5rem' }}
-        >
-          <option value="VIEW_ONLY">VIEW_ONLY</option>
-          <option value="EDIT">EDIT</option>
-          <option value="ALL">ALL</option>
-        </select>
-        <select
-          value={newPrincipal.colgid}
-          onChange={(e) => setNewPrincipal({ ...newPrincipal, colgid: e.target.value })}
-          style={{ marginRight: '0.5rem' }}
-        >
-          <option value="">Select College</option>
-          {colleges.map((col) => (
-            <option key={col.id} value={col.id}>
-              {col.colgname}
-            </option>
-          ))}
-        </select>
-        <button onClick={handleCreatePrincipal}>Add Principal</button>
+    <div className="container mt-5">
+      {/* Header */}
+      <div
+        className="p-4 rounded shadow mb-5 text-white"
+        style={{ background: 'linear-gradient(to right, #43cea2, #185a9d)' }}
+      >
+        <h2 className="fw-bold">👋 Welcome, {principal?.name}</h2>
+        <p className="mb-0">Permission Level: <strong>{principal?.permission}</strong></p>
       </div>
 
-      {/* List */}
-      <ul>
+      {/* Add New Principal Form */}
+      <section className="mb-5">
+        <h3 className="mb-4 text-success">👤 Add New Principal</h3>
+        <div className="row g-3">
+          <div className="col-md-4">
+            <input
+              type="text"
+              className="form-control"
+              placeholder="Name"
+              value={newPrincipal.name}
+              onChange={(e) => setNewPrincipal({ ...newPrincipal, name: e.target.value })}
+            />
+          </div>
+          <div className="col-md-4">
+            <input
+              type="email"
+              className="form-control"
+              placeholder="Email"
+              value={newPrincipal.email}
+              onChange={(e) => setNewPrincipal({ ...newPrincipal, email: e.target.value })}
+            />
+          </div>
+          <div className="col-md-4">
+            <input
+              type="password"
+              className="form-control"
+              placeholder="Password"
+              value={newPrincipal.password}
+              onChange={(e) => setNewPrincipal({ ...newPrincipal, password: e.target.value })}
+            />
+          </div>
+          <div className="col-md-4">
+            <select
+              className="form-control"
+              value={newPrincipal.permission}
+              onChange={(e) => setNewPrincipal({ ...newPrincipal, permission: e.target.value })}
+            >
+              <option value="VIEW_ONLY">VIEW_ONLY</option>
+              <option value="EDIT">EDIT</option>
+              <option value="ALL">ALL</option>
+            </select>
+          </div>
+          <div className="col-md-4">
+            <select
+              className="form-control"
+              value={newPrincipal.colgid}
+              onChange={(e) => setNewPrincipal({ ...newPrincipal, colgid: e.target.value })}
+            >
+              <option value="">Select College</option>
+              {colleges.map((col) => (
+                <option key={col.id} value={col.id}>
+                  {col.colgname}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="col-md-4 d-flex align-items-center">
+            <button className="btn btn-primary w-100" onClick={handleCreatePrincipal}>
+              Add Principal
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Principal List */}
+      <section>
+        <h3 className="mb-4 text-success">👤 Principal List</h3>
         {principals.length === 0 ? (
-          <li>No principals found.</li>
+          <p className="text-muted fst-italic">No principals found.</p>
         ) : (
-          principals.map((p) => (
-            <li key={p.id} style={{ marginBottom: '0.5rem' }}>
-              <strong>{p.name}</strong> ({p.email}) — {p.permission} —{' '}
-              <em>{p.college?.colgname || 'Unknown College'}</em>
-              <button
-                style={{ marginLeft: '1rem' }}
-                onClick={() => deletePrincipal(p.id)}
-              >
-                ❌ Delete
-              </button>
-            </li>
-          ))
+          <div className="table-responsive">
+            <table className="table table-bordered table-hover align-middle">
+              <thead className="table-light">
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Permission</th>
+                  <th>College</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {principals.map((p) => (
+                  <tr key={p.id}>
+                    <td><strong>{p.name}</strong></td>
+                    <td>{p.email}</td>
+                    <td>
+                      <span className={`badge ${
+                        p.permission === 'ALL' ? 'bg-success' : 
+                        p.permission === 'EDIT' ? 'bg-warning text-dark' : 
+                        'bg-secondary'
+                      }`}>
+                        {p.permission}
+                      </span>
+                    </td>
+                    <td><em>{p.college?.colgname || 'Unknown College'}</em></td>
+                    <td>
+                      <button
+                        className="btn btn-outline-danger btn-sm"
+                        onClick={() => deletePrincipal(p.id)}
+                        title="Delete Principal"
+                      >
+                        ❌
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
-      </ul>
+      </section>
     </div>
   );
 }

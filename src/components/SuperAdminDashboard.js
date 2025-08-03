@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import CollegeManagement from './CollegeManagement';
 import PrincipalManagement from './PrincipalManagement';
 
-function SuperAdminDashboard() {
+export default function SuperAdminDashboard() {
   const [principal, setPrincipal] = useState(null);
   const navigate = useNavigate();
 
@@ -21,44 +21,78 @@ function SuperAdminDashboard() {
   };
 
   if (!principal) {
-    return <h2>Loading admin data...</h2>;
+    return (
+      <div className="d-flex justify-content-center align-items-center vh-100">
+        <h2 className="text-secondary">Loading admin data...</h2>
+      </div>
+    );
   }
 
   return (
-    <div style={{ padding: '20px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h2>Welcome, {principal.name}</h2>
-        <button
-          onClick={handleLogout}
-          style={{
-            padding: '5px 10px',
-            background: 'red',
-            color: 'white',
-            border: 'none',
-            borderRadius: '5px'
-          }}
-        >
-          🚪 Logout
-        </button>
+    <div className="container mt-5">
+      {/* Header */}
+      <div
+        className="p-4 rounded shadow mb-5 text-white"
+        style={{
+          background: 'linear-gradient(to right, #43cea2, #185a9d)',
+          position: 'relative',
+        }}
+      >
+        <div className="d-flex justify-content-between align-items-center">
+          <h2 className="fw-bold">👑 Welcome, {principal.name}</h2>
+          <button
+            onClick={handleLogout}
+            className="btn btn-outline-light fw-semibold"
+          >
+            🚪 Logout
+          </button>
+        </div>
+        <p className="mb-0 small">Logged in as Super Admin</p>
       </div>
 
-      <p><strong>Email:</strong> {principal.email}</p>
-      <p><strong>Password:</strong> {principal.password}</p>
-      <p><strong>Permission:</strong> {principal.permission}</p>
+      {/* Principal Info Cards */}
+      <div className="row g-4 mb-5">
+        <div className="col-md-4">
+          <div className="card border-primary shadow-sm h-100">
+            <div className="card-body">
+              <h5 className="card-title">📧 Email</h5>
+              <p className="card-text text-muted">{principal.email}</p>
+            </div>
+          </div>
+        </div>
 
-      <h2>Super Admin Dashboar</h2>
+        <div className="col-md-4">
+          <div className="card border-info shadow-sm h-100">
+            <div className="card-body">
+              <h5 className="card-title">🔒 Password</h5>
+              <p className="card-text text-muted">{principal.password}</p>
+            </div>
+          </div>
+        </div>
 
-      <section style={{ marginTop: '30px' }}>
-        <h3>🧑‍💼 Admin Management</h3>
+        <div className="col-md-4">
+          <div className="card border-success shadow-sm h-100">
+            <div className="card-body">
+              <h5 className="card-title">⚙️ Permission</h5>
+              <p className="card-text text-muted">{principal.permission}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <hr className="my-5" />
+
+      {/* Admin Management Section */}
+      <section className="mb-5">
+        <h3 className="text-success mb-4">🧑‍💼 Admin Management</h3>
         <PrincipalManagement />
       </section>
 
-      <section style={{ marginTop: '30px' }}>
-        <h3>🏫 College Management</h3>
+      {/* College Management Section */}
+      <section>
+        <h3 className="text-success mb-4">🏫 College Management</h3>
         <CollegeManagement />
       </section>
     </div>
   );
 }
-
-export default SuperAdminDashboard;
