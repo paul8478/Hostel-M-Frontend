@@ -46,7 +46,7 @@ function SuperAdminDashboard() {
       <p><strong>Password:</strong> {principal.password}</p>
       <p><strong>Permission:</strong> {principal.permission}</p>
 
-      <h2>Super Admin Dashboard</h2>
+      <h2>Super Admin Dashboar</h2>
 
       <section style={{ marginTop: '30px' }}>
         <h3>🧑‍💼 Admin Management</h3>
